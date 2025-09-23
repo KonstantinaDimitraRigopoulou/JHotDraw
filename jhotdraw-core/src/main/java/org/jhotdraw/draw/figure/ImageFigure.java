@@ -1,10 +1,3 @@
-/*
- * @(#)ImageFigure.java
- *
- * Copyright (c) 1996-2010 The authors and contributors of JHotDraw.
- * You may not use, copy or modify this file, except in compliance with the
- * accompanying license terms.
- */
 package org.jhotdraw.draw.figure;
 
 import java.awt.*;
@@ -26,30 +19,19 @@ import org.jhotdraw.xml.*;
 
 /**
  * A default implementation of {@link ImageHolderFigure} which can hold a buffered image.
- *
- * @author Werner Randelshofer
- * @version $Id$
  */
 public class ImageFigure extends AbstractAttributedDecoratedFigure
         implements ImageHolderFigure {
 
     private static final long serialVersionUID = 1L;
-    /**
-     * This rectangle describes the bounds into which we draw the image.
-     */
+
+    // Fix 1: extracted constant
+    private static final String IMAGE_DATA_TAG = "imageData";
+
     private Rectangle2D.Double rectangle;
-    /**
-     * The image data. This can be null, if the image was created from a BufferedImage.
-     */
     private byte[] imageData;
-    /**
-     * The buffered image. This can be null, if we haven't yet parsed the imageData.
-     */
     private transient BufferedImage bufferedImage;
 
-    /**
-     * Creates a new instance.
-     */
     public ImageFigure() {
         this(0, 0, 0, 0);
     }
@@ -57,6 +39,14 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
     public ImageFigure(double x, double y, double width, double height) {
         rectangle = new Rectangle2D.Double(x, y, width, height);
     }
+
+    // Fix 3: copy constructor (instead of clone())
+    public ImageFigure(ImageFigure other) {
+        this.rectangle = (Rectangle2D.Double) other.rectangle.clone();
+        this.imageData = other.imageData != null ? other.imageData.clone() : null;
+        this.bufferedImage = other.bufferedImage;
+    }
+
 
     // DRAWING
     @Override
@@ -114,11 +104,9 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
         g.draw(r);
     }
 
-    // SHAPE AND BOUNDS
     @Override
     public Rectangle2D.Double getBounds() {
-        Rectangle2D.Double bounds = (Rectangle2D.Double) rectangle.clone();
-        return bounds;
+        return (Rectangle2D.Double) rectangle.clone();
     }
 
     @Override
@@ -129,9 +117,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
         return r;
     }
 
-    /**
-     * Checks if a Point2D.Double is inside the figure.
-     */
     @Override
     public boolean figureContains(Point2D.Double p) {
         Rectangle2D.Double r = (Rectangle2D.Double) rectangle.clone();
@@ -148,11 +133,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
         rectangle.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
     }
 
-    /**
-     * Transforms the figure.
-     *
-     * @param tx The transformation.
-     */
     @Override
     public void transform(AffineTransform tx) {
         Point2D.Double anchor = getStartPoint();
@@ -162,7 +142,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
                 (Point2D.Double) tx.transform(lead, lead));
     }
 
-    // ATTRIBUTES
     @Override
     public void restoreTransformTo(Object geometry) {
         rectangle.setRect((Rectangle2D.Double) geometry);
@@ -170,43 +149,31 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
 
     @Override
     public Object getTransformRestoreData() {
-        return (Rectangle2D.Double) rectangle.clone();
+        return rectangle.clone();
     }
 
-    // EDITING
     @Override
     public Collection<Action> getActions(Point2D.Double p) {
-        LinkedList<Action> actions = new LinkedList<>();
-        return actions;
+        return new LinkedList<>();
     }
 
-    // CONNECTING
     @Override
     public Connector findConnector(Point2D.Double p, ConnectionFigure prototype) {
-        // XXX - This doesn't work with a transformed rect
         return new ChopRectangleConnector(this);
     }
 
     @Override
     public Connector findCompatibleConnector(Connector c, boolean isStartConnector) {
-        // XXX - This doesn't work with a transformed rect
         return new ChopRectangleConnector(this);
     }
 
-    // COMPOSITE FIGURES
-    // CLONING
-    @Override
-    public ImageFigure clone() {
-        ImageFigure that = (ImageFigure) super.clone();
-        that.rectangle = (Rectangle2D.Double) this.rectangle.clone();
-        return that;
-    }
+    // clone() removed
 
     @Override
     public void read(DOMInput in) throws IOException {
         super.read(in);
-        if (in.getElementCount("imageData") > 0) {
-            in.openElement("imageData");
+        if (in.getElementCount(IMAGE_DATA_TAG) > 0) {
+            in.openElement(IMAGE_DATA_TAG);
             String base64Data = in.getText();
             if (base64Data != null) {
                 setImageData(Base64.decode(base64Data));
@@ -219,19 +186,12 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
     public void write(DOMOutput out) throws IOException {
         super.write(out);
         if (getImageData() != null) {
-            out.openElement("imageData");
+            out.openElement(IMAGE_DATA_TAG);
             out.addText(Base64.encodeBytes(getImageData()));
             out.closeElement();
         }
     }
 
-    /**
-     * Sets the image.
-     *
-     * @param imageData The image data. If this is null, a buffered image must be provided.
-     * @param bufferedImage An image constructed from the imageData. If this is null, imageData must
-     * be provided.
-     */
     @Override
     public void setImage(byte[] imageData, BufferedImage bufferedImage) {
         willChange();
@@ -240,12 +200,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
         changed();
     }
 
-    /**
-     * Sets the image data. This clears the buffered image.
-     * <p>
-     * Note: For performance reasons this method stores a reference to the imageData array instead
-     * of cloning it. Do not modify the image data array after invoking this method.
-     */
     public void setImageData(byte[] imageData) {
         willChange();
         this.imageData = imageData;
@@ -253,9 +207,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
         changed();
     }
 
-    /**
-     * Sets the buffered image. This clears the image data.
-     */
     @Override
     public void setBufferedImage(BufferedImage image) {
         willChange();
@@ -264,10 +215,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
         changed();
     }
 
-    /**
-     * Gets the buffered image. If necessary, this method creates the buffered image from the image
-     * data.
-     */
     @Override
     public BufferedImage getBufferedImage() {
         if (bufferedImage == null && imageData != null) {
@@ -275,35 +222,20 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
                 bufferedImage = ImageIO.read(new ByteArrayInputStream(imageData));
             } catch (IOException e) {
                 e.printStackTrace();
-                // If we can't create a buffered image from the image data,
-                // there is no use to keep the image data and try again, so
-                // we drop the image data.
                 imageData = null;
             }
         }
         return bufferedImage;
     }
 
-    /**
-     * Gets the image data. If necessary, this method creates the image data from the buffered
-     * image.
-     * <p>
-     * Note: For performance reasons this method returns a reference to the internally used image
-     * data array instead of cloning it. Do not modify this array.
-     */
     @Override
     public byte[] getImageData() {
         if (bufferedImage != null && imageData == null) {
-            try {
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
                 ImageIO.write(bufferedImage, "PNG", bout);
-                bout.close();
                 imageData = bout.toByteArray();
             } catch (IOException e) {
                 e.printStackTrace();
-                // If we can't create image data from the buffered image,
-                // there is no use to keep the buffered image and try again, so
-                // we drop the buffered image.
                 bufferedImage = null;
             }
         }
@@ -314,11 +246,11 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
     public void loadImage(File file) throws IOException {
         try (InputStream in = new FileInputStream(file)) {
             loadImage(in);
-        } catch (Throwable t) {
+        } catch (Exception e) { // Fix 4
             ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-            IOException e = new IOException(labels.getFormatted("file.failedToLoadImage.message", file.getName()));
-            e.initCause(t);
-            throw e;
+            IOException ioException = new IOException(labels.getFormatted("file.failedToLoadImage.message", file.getName()));
+            ioException.initCause(e);
+            throw ioException;
         }
     }
 
@@ -340,8 +272,6 @@ public class ImageFigure extends AbstractAttributedDecoratedFigure
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        // The call to getImageData() ensures that we have serializable data
-        // in the imageData array.
         getImageData();
         out.defaultWriteObject();
     }
