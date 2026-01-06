@@ -100,7 +100,10 @@ public class CreationTool extends AbstractTool {
 
     public CreationTool(String prototypeClassName, Map<AttributeKey<?>, Object> attributes, String name) {
         try {
-            this.prototype = (Figure) Class.forName(prototypeClassName).newInstance();
+            this.prototype = (Figure) Class
+                    .forName(prototypeClassName)
+                    .getDeclaredConstructor()
+                    .newInstance();
         } catch (Exception e) {
             InternalError error = new InternalError("Unable to create Figure from " + prototypeClassName);
             error.initCause(e);
