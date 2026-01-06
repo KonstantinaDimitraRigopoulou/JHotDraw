@@ -46,6 +46,16 @@ public class EllipseFigure extends AbstractAttributedFigure {
         ellipse = new Ellipse2D.Double(x, y, width, height);
     }
 
+    public EllipseFigure(EllipseFigure template) {
+        this(template.ellipse.x, template.ellipse.y,
+                template.ellipse.width, template.ellipse.height);
+        setAttributes(template.getAttributes());
+    }
+
+    public EllipseFigure copy() {
+        return new EllipseFigure(this);
+    }
+
     // DRAWING
     // SHAPE AND BOUNDS
     // ATTRIBUTES
@@ -142,7 +152,8 @@ public class EllipseFigure extends AbstractAttributedFigure {
     @Override
     public EllipseFigure clone() {
         EllipseFigure that = (EllipseFigure) super.clone();
-        that.ellipse = (Ellipse2D.Double) this.ellipse.clone();
+        that.ellipse = new Ellipse2D.Double(
+                ellipse.x, ellipse.y, ellipse.width, ellipse.height);
         return that;
     }
 
