@@ -1,0 +1,71 @@
+{
+  "className": "org.jhotdraw.draw.tool.TextToolJGivenTests",
+  "name": "Text Tool J Given",
+  "scenarios": [
+    {
+      "className": "org.jhotdraw.draw.tool.TextToolJGivenTests",
+      "testMethodName": "user_can_create_text",
+      "description": "user can create text",
+      "tagIds": [],
+      "explicitParameters": [],
+      "derivedParameters": [],
+      "casesAsTable": false,
+      "scenarioCases": [
+        {
+          "caseNr": 1,
+          "steps": [
+            {
+              "name": "a canvas",
+              "words": [
+                {
+                  "value": "Given",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "a canvas"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 235774900
+            },
+            {
+              "name": "the user creates text",
+              "words": [
+                {
+                  "value": "When",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "the user creates text"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 74208000
+            },
+            {
+              "name": "text is created",
+              "words": [
+                {
+                  "value": "Then",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "text is created"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 70503100
+            }
+          ],
+          "explicitArguments": [],
+          "derivedArguments": [],
+          "status": "SUCCESS",
+          "durationInNanos": 396928200
+        }
+      ],
+      "durationInNanos": 396928200,
+      "executionStatus": "SUCCESS"
+    }
+  ],
+  "tagMap": {}
+}

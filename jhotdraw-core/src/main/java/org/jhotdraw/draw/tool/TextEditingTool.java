@@ -47,7 +47,7 @@ import org.jhotdraw.util.ResourceBundleUtil;
 public class TextEditingTool extends AbstractTool implements ActionListener {
 
     private static final long serialVersionUID = 1L;
-    private FloatingTextField textField;
+    protected transient FloatingTextField textField;
     private TextHolderFigure typingTarget;
 
     /**
@@ -56,6 +56,7 @@ public class TextEditingTool extends AbstractTool implements ActionListener {
     public TextEditingTool(TextHolderFigure typingTarget) {
         this.typingTarget = typingTarget;
     }
+
 
     @Override
     public void deactivate(DrawingEditor editor) {
@@ -75,6 +76,7 @@ public class TextEditingTool extends AbstractTool implements ActionListener {
     }
 
     protected void beginEdit(TextHolderFigure textHolder) {
+        assert textHolder != null : "textHolder should never be null";
         if (textField == null) {
             textField = new FloatingTextField();
             textField.addActionListener(this);
@@ -88,16 +90,19 @@ public class TextEditingTool extends AbstractTool implements ActionListener {
     }
 
     @Override
-    public void mouseReleased(MouseEvent evt) {
+    public void mouseReleased(MouseEvent evt) { //do nothing
     }
 
     protected void endEdit() {
         if (typingTarget != null) {
+            assert typingTarget != null : "typingTarget should not be null when ending edit";
+            assert textField != null : "textField must exist to end editing";
             typingTarget.willChange();
             final TextHolderFigure editedFigure = typingTarget;
             final String oldText = typingTarget.getText();
             final String newText = textField.getText();
-            if (newText.length() > 0) {
+            if (!newText.isEmpty()) {
+                
                 typingTarget.willChange();
                 typingTarget.setText(newText);
                 typingTarget.changed();
@@ -132,7 +137,7 @@ public class TextEditingTool extends AbstractTool implements ActionListener {
             typingTarget = null;
             textField.endOverlay();
         }
-        //         view().checkDamage();
+        
     }
 
     @Override

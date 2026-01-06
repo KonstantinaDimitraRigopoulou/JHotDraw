@@ -59,7 +59,7 @@ import org.jhotdraw.util.ResourceBundleUtil;
 public class TextCreationTool extends CreationTool implements ActionListener {
 
     private static final long serialVersionUID = 1L;
-    private FloatingTextField textField;
+    private transient FloatingTextField textField;
     private TextHolderFigure typingTarget;
 
     /**
@@ -108,10 +108,11 @@ public class TextCreationTool extends CreationTool implements ActionListener {
     }
 
     @Override
-    public void mouseDragged(java.awt.event.MouseEvent e) {
+    public void mouseDragged(java.awt.event.MouseEvent e) {//
     }
 
     protected void beginEdit(TextHolderFigure textHolder) {
+        assert textHolder != null : "textHolder should never be null";
         if (textField == null) {
             textField = new FloatingTextField();
             textField.addActionListener(this);
@@ -125,7 +126,7 @@ public class TextCreationTool extends CreationTool implements ActionListener {
     }
 
     @Override
-    public void mouseReleased(MouseEvent evt) {
+    public void mouseReleased(MouseEvent evt) {//do nothing
     }
 
     protected void endEdit() {
@@ -134,10 +135,11 @@ public class TextCreationTool extends CreationTool implements ActionListener {
             final TextHolderFigure editedFigure = typingTarget;
             final String oldText = typingTarget.getText();
             final String newText = textField.getText();
-            if (newText.length() > 0) {
+            if (!newText.isEmpty()) {
                 typingTarget.setText(newText);
             } else {
                 if (createdFigure != null) {
+                    assert getAddedFigure()  != null: "created figure must not be null";
                     getDrawing().remove(getAddedFigure());
                     // XXX - Fire undoable edit here!!
                 } else {
@@ -175,7 +177,7 @@ public class TextCreationTool extends CreationTool implements ActionListener {
             typingTarget = null;
             textField.endOverlay();
         }
-        //         view().checkDamage();
+        
     }
 
     @Override
@@ -195,6 +197,10 @@ public class TextCreationTool extends CreationTool implements ActionListener {
 
     @Override
     protected void creationFinished(Figure createdFigure) {
+        assert createdFigure != null: "created figure must not be null";
+        assert createdFigure instanceof TextHolderFigure: "created figure must be a TextHolderFigure";
+
+
         beginEdit((TextHolderFigure) createdFigure);
         updateCursor(getView(), new Point(0, 0));
     }
