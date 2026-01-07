@@ -53,8 +53,10 @@ public class EllipseFigure extends AbstractAttributedFigure {
     }
 
     public EllipseFigure copy() {
+        assert this.ellipse != null : "ellipse must not be null";
         return new EllipseFigure(this);
     }
+
 
     // DRAWING
     // SHAPE AND BOUNDS
