@@ -82,10 +82,7 @@ public class RectangleFigure extends AbstractAttributedFigure {
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        rectangle.x = Math.min(anchor.x, lead.x);
-        rectangle.y = Math.min(anchor.y, lead.y);
-        rectangle.width = Math.max(0.1, Math.abs(lead.x - anchor.x));
-        rectangle.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
+        updateBounds(this.rectangle, anchor, lead); 
     }
 
     /**

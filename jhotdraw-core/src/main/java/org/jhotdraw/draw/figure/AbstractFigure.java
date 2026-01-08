@@ -7,14 +7,22 @@
  */
 package org.jhotdraw.draw.figure;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.*;
-import java.awt.geom.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.undo.*;
+import java.awt.Cursor;
+import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Map;
+
+import javax.swing.Action;
+import javax.swing.event.EventListenerList;
+import javax.swing.undo.UndoableEdit;
+
 import org.jhotdraw.beans.AbstractBean;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.Drawing;
@@ -60,6 +68,8 @@ public abstract class AbstractFigure
      */
     public AbstractFigure() {
     }
+
+    
 
     // DRAWING
     // SHAPE AND BOUNDS
@@ -369,6 +379,15 @@ public abstract class AbstractFigure
             changed();
             fireUndoableEditHappened(new SetBoundsEdit(this, oldAnchor, oldLead, anchor, lead));
         }
+    }
+
+    
+    protected void updateBounds(RectangularShape r, Point2D.Double anchor, Point2D.Double lead) {
+        double x = Math.min(anchor.x, lead.x);
+        double y = Math.min(anchor.y, lead.y);
+        double width = Math.max(0.1, Math.abs(lead.x - anchor.x));
+        double height = Math.max(0.1, Math.abs(lead.y - anchor.y));
+        r.setFrame(x, y, width, height);
     }
 
     /**
