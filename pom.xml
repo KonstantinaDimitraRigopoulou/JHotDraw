@@ -5,6 +5,24 @@
 	<artifactId>jhotdraw</artifactId>
 	<version>9.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+
+<dependencies>
+	<dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+    </dependency>
+	<dependency>
+		<groupId>org.mockito</groupId>
+		<artifactId>mockito-core</artifactId>
+		<version>5.12.0</version>
+		<scope>test</scope>
+</dependency>
+
+</dependencies>
+	
+
 	<organization>
 		<name>JHotDraw</name>
 	</organization>
@@ -37,6 +55,9 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 	<description>This is a fork of jhotdraw from http://sourceforge.net/projects/jhotdraw</description>
+	
+
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -48,6 +69,7 @@
 					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
