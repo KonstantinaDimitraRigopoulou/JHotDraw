@@ -50,10 +50,12 @@ public class DefaultDrawingView
      */
     private static final boolean DEBUG = false;
     private Drawing drawing;
+    
     /**
      * Holds the selected figures in an ordered put. The ordering reflects the sequence that was
      * used to select the figures.
      */
+    private final DrawingViewPainter painter = new DrawingViewPainter();
     private Set<Figure> selectedFigures = new LinkedHashSet<>();
     private LinkedList<Handle> selectionHandles = new LinkedList<>();
     private boolean isConstrainerVisible = false;
@@ -69,7 +71,6 @@ public class DefaultDrawingView
     private int detailLevel;
     private DrawingEditor editor;
     private JLabel emptyDrawingLabel;
-    protected BufferedImage backgroundTile;
     private FigureListener handleInvalidator = new FigureAdapter() {
         @Override
         public void figureHandlesChanged(FigureEvent e) {
@@ -141,42 +142,8 @@ public class DefaultDrawingView
      * Draws the background of the drawing view.
      */
     protected void drawBackground(Graphics2D g) {
-        if (drawing == null) {
-            // there is no drawing and thus no canvas
-            g.setColor(getBackground());
-            g.fillRect(0, 0, getWidth(), getHeight());
-        } else if (drawing.get(CANVAS_WIDTH) == null
-                || drawing.get(CANVAS_HEIGHT) == null) {
-            // the canvas is infinitely large
-            Color canvasColor = drawing.get(CANVAS_FILL_COLOR);
-            double canvasOpacity = drawing.get(CANVAS_FILL_OPACITY);
-            if (canvasColor != null) {
-                if (canvasOpacity == 1) {
-                    g.setColor(new Color(canvasColor.getRGB()));
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                } else {
-                    Point r = drawingToView(new Point2D.Double(0, 0));
-                    g.setPaint(getBackgroundPaint(r.x, r.y));
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                    g.setColor(new Color(canvasColor.getRGB() & 0xfffff | ((int) (canvasOpacity * 256) << 24), true));
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                }
-            } else {
-                Point r = drawingToView(new Point2D.Double(0, 0));
-                g.setPaint(getBackgroundPaint(r.x, r.y));
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        } else {
-            // the canvas has a fixed size
-            g.setColor(getBackground());
-            g.fillRect(0, 0, getWidth(), getHeight());
-            Rectangle r = drawingToView(new Rectangle2D.Double(0, 0, drawing.get(CANVAS_WIDTH),
-                    drawing.get(CANVAS_HEIGHT)));
-            g.setPaint(getBackgroundPaint(r.x, r.y));
-            g.fillRect(r.x, r.y, r.width, r.height);
-        }
-    }
-
+    painter.drawBackground(g, drawing, this);
+}
     @Override
     public boolean isSelectionEmpty() {
         return selectedFigures.isEmpty();
@@ -1469,22 +1436,7 @@ public class DefaultDrawingView
      *
      * @return Paint.
      */
-    protected Paint getBackgroundPaint(
-            int x, int y) {
-        if (backgroundTile == null) {
-            backgroundTile = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = backgroundTile.createGraphics();
-            g.setColor(Color.white);
-            g.fillRect(0, 0, 16, 16);
-            g.setColor(new Color(0xdfdfdf));
-            g.fillRect(0, 0, 8, 8);
-            g.fillRect(8, 8, 8, 8);
-            g.dispose();
-        }
-        return new TexturePaint(backgroundTile,
-                new Rectangle(x, y, backgroundTile.getWidth(), backgroundTile.getHeight()));
-    }
-
+    
     @Override
     public DrawingEditor getEditor() {
         return editor;
