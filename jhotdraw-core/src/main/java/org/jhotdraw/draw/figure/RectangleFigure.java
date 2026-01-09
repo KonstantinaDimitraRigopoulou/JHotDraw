@@ -13,6 +13,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import org.jhotdraw.draw.AttributeKeys;
+import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.Geom;
 
 /**
@@ -117,4 +118,20 @@ public class RectangleFigure extends AbstractAttributedFigure {
         return that;
     }
     // EVENT HANDLING
+
+
+    /**
+ * Ensures the figure meets the minimum size requirements.
+ * This logic was moved here from CreationTool to fix Feature Envy.
+ */
+public void validateMinimalSize(Dimension2DDouble minimalSize) {
+    willChange();
+    if (this.rectangle.width < minimalSize.width) {
+        this.rectangle.width = minimalSize.width;
+    }
+    if (this.rectangle.height < minimalSize.height) {
+        this.rectangle.height = minimalSize.height;
+    }
+    changed();
+}
 }

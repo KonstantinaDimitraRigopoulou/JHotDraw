@@ -21,6 +21,7 @@ import org.jhotdraw.draw.connector.ChopRoundRectangleConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.RoundRectangleRadiusHandle;
+import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.xml.DOMInput;
 import org.jhotdraw.xml.DOMOutput;
@@ -169,7 +170,7 @@ public class RoundRectangleFigure extends AbstractAttributedFigure {
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        updateBounds(this.roundrect, anchor, lead); // One line: No more duplicate math!
+        updateBounds(this.roundrect, anchor, lead); 
     }
 
     /**
@@ -243,4 +244,18 @@ public class RoundRectangleFigure extends AbstractAttributedFigure {
         out.addAttribute("arcWidth", roundrect.arcwidth);
         out.addAttribute("arcHeight", roundrect.archeight);
     }
+    /**
+ * Ensures the figure meets the minimum size requirements.
+ * This logic was moved here from CreationTool to fix Feature Envy.
+ */
+public void validateMinimalSize(Dimension2DDouble minimalSize) {
+    willChange();
+    if (this.roundrect.width < minimalSize.width) {
+        this.roundrect.width = minimalSize.width;
+    }
+    if (this.roundrect.height < minimalSize.height) {
+        this.roundrect.height = minimalSize.height;
+    }
+    changed();
+}
 }
