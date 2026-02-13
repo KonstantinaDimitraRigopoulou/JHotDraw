@@ -34,7 +34,7 @@ public abstract class AbstractAttributedFigure extends AbstractFigure implements
     /**
      * Holds the attributes of the figure.
      */
-    private HashMap<AttributeKey<?>, Object> attributes = new HashMap<>();
+    private transient HashMap<AttributeKey<?>, Object> attributes = new HashMap<>();
     /**
      * Forbidden attributes can't be put by the put() operation. They can only
      * be changed by put().
@@ -44,7 +44,7 @@ public abstract class AbstractAttributedFigure extends AbstractFigure implements
     /**
      * Creates a new instance.
      */
-    public AbstractAttributedFigure() {
+    protected AbstractAttributedFigure() {
     }
 
     public void setAttributeEnabled(AttributeKey<?> key, boolean b) {
@@ -71,7 +71,7 @@ public abstract class AbstractAttributedFigure extends AbstractFigure implements
 
     @Override
     public Map<AttributeKey<?>, Object> getAttributes() {
-        return (Map<AttributeKey<?>, Object>) new HashMap<>(attributes);
+        return new HashMap<>(attributes);
     }
 
     @Override
@@ -205,9 +205,7 @@ public abstract class AbstractAttributedFigure extends AbstractFigure implements
                 Object prototypeValue = prototype.get(key);
                 @SuppressWarnings("unchecked")
                 Object attributeValue = get(key);
-                if (prototypeValue != attributeValue
-                        || (prototypeValue != null && attributeValue != null
-                        && !prototypeValue.equals(attributeValue))) {
+                if (!Objects.equals(prototypeValue, attributeValue)) {
                     if (!isElementOpen) {
                         out.openElement("a");
                         isElementOpen = true;
@@ -232,11 +230,9 @@ public abstract class AbstractAttributedFigure extends AbstractFigure implements
                 String name = in.getTagName();
                 Object value = in.readObject();
                 AttributeKey<?> key = getAttributeKey(name);
-                if (key != null && key.isAssignable(value)) {
-                    if (forbiddenAttributes == null
-                            || !forbiddenAttributes.contains(key)) {
-                        set((AttributeKey<Object>) key, value);
-                    }
+                if (key != null && key.isAssignable(value)
+                        && (forbiddenAttributes == null || !forbiddenAttributes.contains(key))) {
+                    set((AttributeKey<Object>) key, value);
                 }
                 in.closeElement();
             }
